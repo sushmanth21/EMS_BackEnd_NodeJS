@@ -2,7 +2,7 @@ const Employee = require('../models/Employee')
 
 let EmployeeController = {};
 
-//--------- Get list of all employees ---------
+//------------------ Get list of all employees ------------------
 EmployeeController.getEmployees = async (req, res, next)=> {
     let allEmployees;
 
@@ -20,7 +20,7 @@ EmployeeController.getEmployees = async (req, res, next)=> {
     return res.status(200).json(allEmployees);
 };
 
-//--------- Get employee by ID ---------
+//------------------ Get employee by ID ------------------
 EmployeeController.getEmployeeById = async (req, res, next)=> {
     let id = req.params.id;
     let foundEmployee
@@ -39,15 +39,11 @@ EmployeeController.getEmployeeById = async (req, res, next)=> {
     return res.status(200).json(foundEmployee);
 };
 
-// --------- Add a new employee ---------
+// ------------------ Add a new employee ------------------
 EmployeeController.addEmployee = async (req, res, next)=>{
     const { id, name, gender, age, state } = req.body;
 
-    let employee = new Employee(
-        {
-            id, name, gender, age, state
-        }
-    )
+    let employee = new Employee({ id, name, gender, age, state })
 
     try{
         await employee.save();
@@ -59,28 +55,37 @@ EmployeeController.addEmployee = async (req, res, next)=>{
     return res.status(201).send({message: "Employee added successfully!"});
 };
 
-// --------- Edit employee by ID ---------
+// ------------------ Edit employee by ID ------------------
 EmployeeController.editEmployee = async (req, res, next)=> {
     const id = req.params.id;
-    const data = req.body
+    const data = req.body.data
 
-    Employee.updateOne({'id':id}, {$set: data}, (err, result)=>{
-        if(err){
-            console.log(err)
-            return res.status(502).json(err);
+    let updatedEmployee;
+    try{
+        updatedEmployee = await Employee.findOneAndUpdate({'id':id},data)
+
+        if(!updatedEmployee){
+            return res.status(404).json({message: `No Employee Found with ID ${id}`});
         }
-        else{
-            return res.status(200).json({message: "Employee details updated successfully!"});
-        }
-    })
+    }
+    catch(err){
+        console.log(err)
+        return res.status(502).json(err);
+    }
+    return res.status(201).send({message: `Employee with ID ${id} updated successfully!`});
 };
 
-// --------- Delete employee by ID ---------
+// ------------------ Delete employee by ID ------------------
 EmployeeController.deleteEmployee = async (req, res, next)=> {
     const id = req.params.id;
+    let foundEmployee;
 
     try{
-        await Employee.findOneAndDelete({id:id})
+        foundEmployee = await Employee.findOneAndDelete({id:id})
+
+        if(!foundEmployee){
+            return res.status(404).json({message: `No Employee Found with ID ${id}`});
+        }
     }
     catch(err){
         console.log(err)

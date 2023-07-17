@@ -1,4 +1,4 @@
-// ------------------- IMPORTS -------------------
+// ---------------------------- IMPORTS ----------------------------
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
@@ -7,7 +7,7 @@ const port = 3000;
 
 const employee = require('./routes/Employee'); 
 
-// ------------------- MIDDLEWARE -------------------
+// ---------------------------- MIDDLEWARE ----------------------------
 app.use(cors({credentials: true, origin:"http://localhost:3000"}));
 app.use(express.json());
 
@@ -23,6 +23,6 @@ mongoose.connect('mongodb+srv://sync212121:TDgYSV4jCA1AJIkV@ems.9t1fpmk.mongodb.
         console.log(err)
     })
 
-// ------------------- ROUTES -------------------
+// ---------------------------- ROUTES ----------------------------
 app.use('/employee', employee); 
 
